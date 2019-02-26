@@ -120,32 +120,37 @@ def generate_next_move(nearest_food, body):
 
 def correct_path(direction, body, board):
     head = body[0]
+    enemy_coords = []
     enemies = board["snakes"]
+    for enemy in enemies:
+        for coord in enemy["body"]:
+            enemy_coords.append(coord)
+
+
     if direction == "up":
         next_place = {"x": head["x"], "y": head["y"] - 1}
-        if next_place in body or next_place["y"] == -1:
+        if next_place in body or next_place["y"] == -1 or next_place in enemy_coords:
             direction = "right"
             return correct_path(direction, body, board)
         else:
             return direction
     elif direction == "down":
         next_place = {"x": head["x"], "y": head["y"] + 1}
-        if next_place in body or next_place["y"] == board["height"]:
+        if next_place in body or next_place["y"] == board["height"] or next_place in enemy_coords:
             direction = "left"
             return correct_path(direction, body, board)
         else:
-
             return direction
     elif direction == "right":
         next_place = {"x": head["x"] + 1, "y": head["y"]}
-        if next_place in body or next_place["x"] == board["width"]:
+        if next_place in body or next_place["x"] == board["width"] or next_place in enemy_coords:
             direction = "down"
             return correct_path(direction, body, board)
         else:
             return direction
     elif direction == "left":
         next_place = {"x": head["x"] - 1, "y": head["y"]}
-        if next_place in body or next_place["x"] == -1:
+        if next_place in body or next_place["x"] == -1 or next_place in enemy_coords:
             direction = "up"
             return correct_path(direction, body, board)
         else:

@@ -60,7 +60,6 @@ def move():
     food_locations = data["board"]["food"]
     nearest_food = calculate_nearest_food(food_locations, head)
     direction = generate_next_move(nearest_food, body)
-    print(data["turn"])
     #print(direction)
     direction = correct_path(direction, body, board)
     #print(direction)
@@ -126,7 +125,6 @@ def correct_path(direction, body, board):
         next_place = {"x": head["x"], "y": head["y"] - 1}
         if next_place in body or next_place["y"] == -1:
             direction = "right"
-            print(direction)
             return correct_path(direction, body, board)
         else:
             return direction
@@ -134,7 +132,6 @@ def correct_path(direction, body, board):
         next_place = {"x": head["x"], "y": head["y"] + 1}
         if next_place in body or next_place["y"] == board["height"]:
             direction = "left"
-            print(direction)
             return correct_path(direction, body, board)
         else:
 
@@ -143,7 +140,6 @@ def correct_path(direction, body, board):
         next_place = {"x": head["x"] + 1, "y": head["y"]}
         if next_place in body or next_place["x"] == board["width"]:
             direction = "down"
-            print(direction)
             return correct_path(direction, body, board)
         else:
             return direction
@@ -151,7 +147,6 @@ def correct_path(direction, body, board):
         next_place = {"x": head["x"] - 1, "y": head["y"]}
         if next_place in body or next_place["x"] == -1:
             direction = "up"
-            print(direction)
             return correct_path(direction, body, board)
         else:
             return direction

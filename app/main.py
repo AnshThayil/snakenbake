@@ -55,16 +55,32 @@ def move():
     """
     #print(json.dumps(data))
     body = data["you"]["body"]
+    myName = data["you"]["name"]
     head = body[0]
     board = data["board"]
     food_locations = data["board"]["food"]
+    health = data["you"]["health"]
+    x = 5
+    y = 15
     nearest_food = calculate_nearest_food(food_locations, head)
     direction = generate_next_move(nearest_food, body)
+    print(data["turn"])
     #print(direction)
-    direction = correct_path(direction, body, board)
+    count = 0
+    direction = correct_path(direction, body, board, nearest_food, count, myName)
     #print(direction)
 
-
+    # if (len(food_locations) == 0):
+    #     direction = coil()
+    # else:
+    #     if (len(snake) >= x):
+    #         if (health < distance_to_nearest_food + y):
+    #             direction = coil()
+    #         else:
+    #             direction = move_to_food()
+    #     else:
+    #         direction = move_to_food()
+    #
     return move_response(direction)
 
 
@@ -118,43 +134,83 @@ def generate_next_move(nearest_food, body):
                 output = "down"
     return output
 
-def correct_path(direction, body, board):
-    head = body[0]
-    enemy_coords = []
-    enemies = board["snakes"]
-    for enemy in enemies:
-        for coord in enemy["body"]:
-            enemy_coords.append(coord)
+def correct_path(direction, body, board,nearest_food, count, myName):
+    print(count)
+    if count < 4:
+        head = body[0]
+        enemy_coords = []
+        enemy_heads = []
+        enemies = board["snakes"]
+        for enemy in enemies:
+
+            if enemy["name"] != myName:
+                if enemy["body"][0] not in board["food"]:
+                    for i in range(len(enemy["body"]) - 1):
+                        if i == 0:
+                            enemy_heads.append(enemy["body"][i])
+                        enemy_coords.append(enemy["body"][i])
+                else:
+                    for i in range(len(enemy["body"])):
+                        if i == 0:
+                            enemy_heads.append(enemy["body"][i])
+                        enemy_coords.append(enemy["body"][i])
 
 
-    if direction == "up":
-        next_place = {"x": head["x"], "y": head["y"] - 1}
-        if next_place in body or next_place["y"] == -1 or next_place in enemy_coords:
-            direction = "right"
-            return correct_path(direction, body, board)
-        else:
-            return direction
-    elif direction == "down":
-        next_place = {"x": head["x"], "y": head["y"] + 1}
-        if next_place in body or next_place["y"] == board["height"] or next_place in enemy_coords:
-            direction = "left"
-            return correct_path(direction, body, board)
-        else:
-            return direction
-    elif direction == "right":
-        next_place = {"x": head["x"] + 1, "y": head["y"]}
-        if next_place in body or next_place["x"] == board["width"] or next_place in enemy_coords:
-            direction = "down"
-            return correct_path(direction, body, board)
-        else:
-            return direction
-    elif direction == "left":
-        next_place = {"x": head["x"] - 1, "y": head["y"]}
-        if next_place in body or next_place["x"] == -1 or next_place in enemy_coords:
-            direction = "up"
-            return correct_path(direction, body, board)
-        else:
-            return direction
+
+        if direction == "up":
+            next_place = {"x": head["x"], "y": head["y"] - 1}
+            if next_place in body or next_place["y"] == -1 or next_place in enemy_coords or surround_check(enemy_heads, next_place, nearest_food):
+                direction = "right"
+                count += 1
+                return correct_path(direction, body, board, nearest_food, count, myName)
+            else:
+                return direction
+
+        elif direction == "down":
+            next_place = {"x": head["x"], "y": head["y"] + 1}
+            if next_place in body or next_place["y"] == board["height"] or next_place in enemy_coords or surround_check(enemy_heads, next_place, nearest_food):
+                direction = "left"
+                count += 1
+                return correct_path(direction, body, board, nearest_food, count, myName)
+            else:
+                return direction
+
+        elif direction == "right":
+            next_place = {"x": head["x"] + 1, "y": head["y"]}
+            if next_place in body or next_place["x"] == board["width"] or next_place in enemy_coords or surround_check(enemy_heads, next_place, nearest_food):
+                direction = "down"
+                count += 1
+                return correct_path(direction, body, board, nearest_food, count, myName)
+            else:
+                return direction
+
+        elif direction == "left":
+            next_place = {"x": head["x"] - 1, "y": head["y"]}
+            if next_place in body or next_place["x"] == -1 or next_place in enemy_coords or surround_check(enemy_heads, next_place, nearest_food):
+                direction = "up"
+                count += 1
+                return correct_path(direction, body, board, nearest_food, count, myName)
+            else:
+                return direction
+    else:
+        return direction
+
+def surround_check(enemy_heads, next_place, nearest_food):
+    if next_place == nearest_food:
+        surround = []
+        surround.append({"x": next_place["x"] + 1, "y": next_place["y"]})
+        surround.append({"x": next_place["x"] - 1, "y": next_place["y"]})
+        surround.append({"x": next_place["x"], "y": next_place["y"] + 1})
+        surround.append({"x": next_place["x"], "y": next_place["y"] - 1})
+        for coord in surround:
+            if coord in enemy_heads:
+                return True
+    return False
+
+
+
+
+
 
 if __name__ == '__main__':
     bottle.run(

@@ -62,7 +62,10 @@ def move():
     health = data["you"]["health"]
     x = 5
     y = 15
-    nearest_food = calculate_nearest_food(food_locations, head)
+    if len(food_locations) == 0:
+        nearest_food = body[len(body) -1]
+    else:
+        nearest_food = calculate_nearest_food(food_locations, head)
     direction = generate_next_move(nearest_food, body)
     print(data["turn"])
     #print(direction)

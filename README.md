@@ -1,4 +1,4 @@
-#Snake-N-Bake
+# Snake-N-Bake
 
 This is my entry into [Battlesnake 2019](https://play.battlesnake.io/).
 The goal of the competetion is to build a Snake Bot and compete with other developers.
